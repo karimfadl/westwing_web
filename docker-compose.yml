@@ -1,0 +1,43 @@
+version: '3.2'
+services:
+
+  westwing_lb:
+    image: nginx:alpine
+    container_name: westwing_lb
+    restart: always
+    ports:
+      - "80:80"
+    volumes:
+      - ./config/lb.conf:/etc/nginx/conf.d/lb.conf
+
+  westwing_web1:
+    image: karimfadl/nginx-php-fpm7
+    container_name: westwing_web1
+    restart: always
+    expose:
+      - "80"
+    depends_on:
+      - westwing_lb
+
+  westwing_web2:
+    image: karimfadl/nginx-php-fpm7
+    container_name: westwing_web2
+    restart: always
+    expose:
+      - "80"
+    depends_on:
+      - westwing_lb
+
+  westwing_db:
+    image: percona:8
+    container_name: westwing_db
+    restart: always
+    expose:
+      - "3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: 'root'
+      MYSQL_DATABASE: 'wls'
+      MYSQL_USER: 'admin'
+      MYSQL_PASSWORD: 'ad'
+    volumes:
+      - ./databases:/var/lib/mysql
